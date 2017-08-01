@@ -10,13 +10,13 @@
 <meta name="google-signin-client_id"
      content="966400828938-vc6umm781j1nse8cg6cupgc2g3cc0ake.apps.googleusercontent.com">
 
-<title>Servlet OAuth example</title>
+<!--Styles-->
+<link rel="stylesheet" href="css/index.css" />
+<title>Login</title>
 </head>
-<body>
-	<h2>Servlet OAuth example</h2>
-	<br>
-	<div class="g-signin2" data-onsuccess="onSignIn"></div>
-
+<body class="bg">
+	<!--<div class="g-signin2 loginBtn loginBtn--google" data-onsuccess="onSignIn"></div>-->
+        <div class="g-signin2 " data-onsuccess="onSignIn"></div>
 	<script>
 	function onSignIn(googleUser) {
            
