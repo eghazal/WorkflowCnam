@@ -6,18 +6,31 @@ html,body { height: 100% !important; margin: 0px; padding: 0px;width: 100% !impo
 .manualMenu{height: 100%;}
 #manualFlowChart{ height: calc(100% - 130px); width: 100%;}
 .flowchart {display: block;text-align: center;margin: 0 auto;}
-.btnRender{background: rgb(125, 125, 125);}
+.btnRender, .btnAdd{background: rgb(125, 125, 125);margin-bottom: 10px;}
 .btnMenu{display: block;}
 .taskPopup{width: 100%;display: none;}
 .taskPopupCont{width: 60%;margin: auto;border: 1px solid black;background-color: white;border-radius: 5px;padding: 15px;position: relative;}
-.taskCloseCont{position: absolute;right: -6%;top: -9%;}
+.taskCloseCont{position: absolute;right: -6%;top: 0%;}
 .taskClose{cursor: pointer;}
 .taskTitle{font-size: 20px; margin: 15px 0px;}
 .taskRow{margin: 10px 0px;}
 .inputTitle{height: 35px; margin: 0; line-height: 32px;}
 .inputTask{width: 100%;height: 35px; outline: 0;border: 0;border-bottom: 1px dotted rgb(125, 125, 125);}
-.end-element, .task, tspan{cursor: pointer}
-
+.end-element, .task, tspan{cursor: pointer;}
+.addBtn {float: left;cursor: pointer; }
+.ttl {text-align: left;line-height: 20px;}
+.cont {padding: 5px 10px;}
+.ddl{width: 100%;height: 35px;}
+.dragDropMenu {border: 1px solid #ddd;}
+.inputText{width: 100%;height: 35px;}
+.inputRadio{margin-right: 5px !important;}
+.radTtl{float: left;line-height: 35px; margin-right: 15px;}
+.inputTextArea{width: 100%; height: 60px;}
+.falseCont, .trueCont, .popupFalseCont, .popupTrueCont{display: none;}
+.chosenStartDate, .chosenEndDate{float: left;margin-left: 10px;line-height: 35px;}
+.popupChosenStartDate, .popupChosenEndDate{float: left;margin-left: 15px;line-height: 35px;}
+.btnStartDate, .btnEndDate{float: left;}
+.xdsoft_datetimepicker {z-index: 9999 !important;}
 @media screen and (max-width: 768px) {
     .taskPopup{top: 9% !important;}
 	.taskPopupCont{width: 80%;}

@@ -72,3 +72,8 @@ body, html {
 .g-signin2--google:focus {
   background: #E74B37;
 }
+.topcorner{
+   position:absolute;
+   top:0.5%;
+   right:0.5%;
+  }
