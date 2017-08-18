@@ -35,10 +35,9 @@ public class workflowMain extends HttpServlet {
             String email = payLoad.getEmail();
             System.out.println("User name: " + name);
             System.out.println("User email: " + email);
-
             HttpSession session = req.getSession(true);
             session.setAttribute("userName", name);
-          
+            
             //req.getServletContext().getRequestDispatcher("/workflowMain.jsp").forward(req, resp);
             context.getRequestDispatcher("/workflowMain.jsp").forward(req, resp);
 

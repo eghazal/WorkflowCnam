@@ -17,6 +17,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="js/raphael-min.js"></script>
 <script src="js/jquery.min.js"></script>
+<script src="js/services.js"></script>
 <script src="js/flowchart.min.js"></script>
 <script src="js/jquery.flowchart.js"></script>
 <script src="js/workflow.js"></script>
@@ -199,10 +200,18 @@ cond(no)->op</div>
        
 
 <script>
-     function onLoad() {
+    $( document ).ready(function() {
+     console.log(getAllUsers());
+       
+    });
+    
+    
+  function onLoad() {
       gapi.load('auth2', function() {
         gapi.auth2.init();
       });
+      
+       
     }
     
   function signOut() {
