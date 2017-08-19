@@ -554,3 +554,18 @@ function getFromAPI(){
       console.log(data);
   });
 }
+
+function saveWorkflow(){
+    //https://jsonplaceholder.typicode.com/posts/1
+    //http://localhost:8080/GetUsers
+    $.ajax({
+            crossDomain: true,
+            url: 'https://workflowapi-176706.appspot.com/UpsertWorkflow',
+            type: 'POST',
+            data: {workflowObj: JSON.stringify(workflowTasks)},
+            dataType: "json",
+            success: function(data){
+                console.log(data);
+            }
+        });
+}
