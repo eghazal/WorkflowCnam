@@ -72,6 +72,14 @@ $(document).ready(function() {
         });
         $(".popupChosenEndDate").html(formatDateStr(taskObj.endDate));
         
+        if(taskObj.type == "condition"){
+            $(".popupTrueCont").show();
+            $(".popupFalseCont").show();
+        }else{
+            $(".popupTrueCont").hide();
+            $(".popupFalseCont").hide();
+        }
+        
         $('#taskPopup').attr("taskGraphIndex", taskObj.taskGraphIndex).bPopup({
                 closeClass:'closeModule',
                 modalClose: false,
@@ -481,7 +489,7 @@ function createWorkflowStr(){
 
 function removeTask(){
     var taskGraphIndex = $("#taskPopup").attr("taskgraphindex");
-    
+    //REMOVING TASK FROM ARRAY
     var indexOfTask = -1;
     $.each(workflowTasks, function (i) {
         if (workflowTasks[i]["taskGraphIndex"] == taskGraphIndex) {
@@ -491,9 +499,22 @@ function removeTask(){
     
     workflowTasks.splice(indexOfTask, 1);
     
+    //REMOVING REDIRECTION LINK TO THE DELETED TASK
+    $.each(workflowTasks, function (i) {
+        if (workflowTasks[i]["falseRedirect"] == taskGraphIndex) {
+            workflowTasks[i]["falseRedirect"] = "";
+        }
+        
+        if (workflowTasks[i]["trueRedirect"] == taskGraphIndex) {
+            workflowTasks[i]["trueRedirect"] = "";
+        }
+    });
+    
+    //UPDATING LISTS
     updateLists();
     createWorkflowStr();
     renderWorkflow();
+    $("#taskPopup").attr("taskgraphindex", "");
     $("#taskPopup").bPopup().close();
 }
 
@@ -508,4 +529,28 @@ function getObjects(obj, key, val) {
         }
     }
     return objects;
+}
+
+//function jsonpCallbackFunction(data){
+//    console.log(data);
+//}
+
+//function getFromAPI(){
+//    //https://jsonplaceholder.typicode.com/posts/1
+//    //http://localhost:8080/GetUsers
+//    $.ajax({
+//            crossOrigin: true,
+//            url: 'http://localhost:8080/GetUsers',
+//            type: 'GET',
+//            dataType: "jsonp",
+//            jsonpCallback: 'jsonpCallbackFunction'
+//        });
+//}
+
+function getFromAPI(){
+    //https://workflowapi-176706.appspot.com
+  $.getJSON("https://workflowapi-176706.appspot.com/GetUsers?callback=?",
+    function(data){
+      console.log(data);
+  });
 }
