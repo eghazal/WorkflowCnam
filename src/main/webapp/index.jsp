@@ -81,7 +81,7 @@
                 alertify.confirm("This account doens\'t exist in our database, would you like to sign up ?", function (e) {
                     if (e) {
                         alertify.log("Signin Up, please wait.");
-                        //signUpUsers();
+                        signUpUsers();
                         var subject = "New sign up."
                         var content = "New user has just signed up: \n Name : " + userProfile.getName() +
                                 + ". \n Email : " + userProfile.getEmail() + ".";
