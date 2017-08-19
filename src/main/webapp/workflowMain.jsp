@@ -201,17 +201,13 @@ cond(no)->op</div>
 
 <script>
     $( document ).ready(function() {
-     console.log(getAllUsers());
-       
+     
     });
-    
     
   function onLoad() {
       gapi.load('auth2', function() {
         gapi.auth2.init();
       });
-      
-       
     }
     
   function signOut() {
