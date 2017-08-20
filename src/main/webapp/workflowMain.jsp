@@ -112,6 +112,7 @@
 				<div class="btn btnRender">RENDER WORKFLOW</div>
 			</div>
 			
+                        <div class="btn btnSaveWorkflow" id="btnSaveWorkflow" value="Save" style="float: right;">Save</div>
 		</div>
 		<div class="flowchart col-md-9 col-sm-8 col-xs-12 noPadding">st=>start: User login
 op=>operation: Login operation
@@ -121,6 +122,7 @@ e=>end: Into admin panel
 st->op->cond
 cond(yes)->e
 cond(no)->op</div>
+            
         </div>
 	<div class="taskPopup" id="taskPopup">
 			<div class="taskPopupCont">

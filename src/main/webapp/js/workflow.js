@@ -2,6 +2,8 @@ var workflowTasks = [];
 var operationsCount = 1;
 var conditionsCount = 1;
 var workflowStr = "";
+var apiURL="localhost:9999";
+//var apiURL="https://workflowapi-176706.appspot.com";
 $(document).ready(function() {
     
     if(workflowTasks.length == 0){
@@ -37,6 +39,7 @@ $(document).ready(function() {
                 for (var taskCount = 0; taskCount < $(".task").length; taskCount++) {
                     if ($(this).is($($(".task")[taskCount]))) {
                         taskObj = workflowTasks[taskCount];
+                        continue;
                     }
                 }
             }  
@@ -187,6 +190,10 @@ $(document).ready(function() {
     
     $(".btnDelete").on("click", function(){
         removeTask();
+    });
+    
+    $(".btnSaveWorkflow").on("click",function(){
+        saveWorkflow1();
     });
 });
 
@@ -549,7 +556,7 @@ function getObjects(obj, key, val) {
 
 function getFromAPI(){
     //https://workflowapi-176706.appspot.com
-  $.getJSON("https://workflowapi-176706.appspot.com/GetUsers?callback=?",
+  $.getJSON(apiURL+'/GetUsers?callback=?',
     function(data){
       console.log(data);
   });
@@ -558,14 +565,40 @@ function getFromAPI(){
 function saveWorkflow(){
     //https://jsonplaceholder.typicode.com/posts/1
     //http://localhost:8080/GetUsers
+    console.log(JSON.stringify(workflowTasks));
     $.ajax({
             crossDomain: true,
-            url: 'https://workflowapi-176706.appspot.com/UpsertWorkflow',
+            url: apiURL+'/UpsertWorkflow',
             type: 'POST',
+            crossDomain: true,
             data: {workflowObj: JSON.stringify(workflowTasks)},
-            dataType: "json",
+            dataType: "jsonp",
             success: function(data){
                 console.log(data);
             }
         });
+}
+
+function saveWorkflow1(){
+    console.log(JSON.stringify(workflowTasks));
+    return $.ajax({
+                    url: "http://query.yahooapis.com/v1/public/yql",
+                    // the name of the callback parameter, as specified by the YQL service
+                    jsonp: "callback",
+                    // tell jQuery we're expecting JSONP
+                    dataType: "jsonp",
+                    // tell YQL what we want and that we want JSON
+                    data: {
+                        q: "select * from json where " +
+                                +"url="+apiURL+"/UpsertWorkflow",
+                        type: 'POST',
+                        workflowObj: JSON.stringify(workflowTasks),
+                        crossDomain: true,
+                        format: "json"
+                    },
+                    // work with the response
+                    success: function (response) {
+                        return true;
+                    }
+                });
 }

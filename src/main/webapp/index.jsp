@@ -81,10 +81,9 @@
                 alertify.confirm("This account doens\'t exist in our database, would you like to sign up ?", function (e) {
                     if (e) {
                         alertify.log("Signin Up, please wait.");
-                        signUpUsers();
+                        signUpUsers1();
                         var subject = "New sign up."
-                        var content = "New user has just signed up: \n Name : " + userProfile.getName() +
-                                + ". \n Email : " + userProfile.getEmail() + ".";
+                        var content = "New user has just signed up. Name : " + userProfile.getName() + "and email : " + userProfile.getEmail() + ".";
                         sendEmail("eghazal27@gmail.com", subject, content);
                         redirectToWorkflowPage();
 
@@ -104,6 +103,22 @@
 
                     success: function (data) {
                         return (JSON.stringify(data));
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error");
+                    }
+                });
+            }
+            function signUpUsers1(){
+                 return jQuery.ajax({
+                    type: "POST",
+                    url: "https://workflowapi-176706.appspot.com/AddUser?UserName=" + userProfile.getName() +"&UserMail=" + userProfile.getEmail()+"&UserGender=NA&UserBirthDate=2000-01-17",
+                    cache: false,
+                    crossDomain: true,
+                    processData: true,
+
+                    success: function (data) {
+                        return true;
                     },
                     error: function (XMLHttpRequest, textStatus, errorThrown) {
                         alert("error");
