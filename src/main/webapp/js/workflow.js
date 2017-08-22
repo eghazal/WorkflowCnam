@@ -36,7 +36,7 @@ $(document).ready(function() {
         var taskObj = {};
         if($(this).prop("classList").toString().indexOf("task") > -1){
             if ($(".task").length > 0) {
-                for (var taskCount = 0; taskCount < $(".task").length; taskCount++) {
+                for (var taskCount = 0; taskCount <= $(".task").length - 1; taskCount++) {
                     if ($(this).is($($(".task")[taskCount]))) {
                         taskObj = workflowTasks[taskCount];
                         continue;
@@ -244,138 +244,226 @@ function formatDateStr(dateStr){
     return date;
 }
 
+
 function addTask(elementClicked){
     //VALIDATE TASK BEFORE ADD
     
     var elementId = $(elementClicked).attr("id");
     switch(elementId.toLowerCase()){
         case "btnadd":
-            //ADDING TASK TO OBJ
-            var tag = "";
-            if ($(".ddlType").val() == "condition") {
-                tag = "cond" + conditionsCount;
-                conditionsCount++;
-            } else {
-                if ($(".ddlType").val() == "operation") {
-                    tag = "op" + operationsCount;
-                    operationsCount++;
-                }
+            var canAdd = true;
+            var msg = "";
+                    
+            if($('.btnStartDate').datetimepicker('getValue') > $('.btnEndDate').datetimepicker('getValue')){
+                canAdd = false;
+                msg = "Start date should be less than end date";
             }
-            var task = {
-                "taskId": "0",
-                "taskGraphIndex": workflowTasks.length,
-                "tag": tag,
-                "title": $(".titleVal").val(),
-                "type": $(".ddlType").val(),
-                "trueRedirect": ($(".ddlType").val() == "condition") ? $(".ddlTrueRedirect").val() : "",
-                "falseRedirect": ($(".ddlType").val() == "condition") ? $(".ddlFalseRedirect").val() : "",
-                "description": $(".descriptionVal").val(),
-                "email": $(".emailVal").val(),
-                "startDate": $('.btnStartDate').datetimepicker('getValue'),
-                "endDate": $('.btnEndDate').datetimepicker('getValue')
+            
+            if($('.btnEndDate').datetimepicker('getValue') == "null" || $('.btnEndDate').datetimepicker('getValue') == undefined){
+                canAdd = false;
+                msg = "Please choose end date";
             }
-
-            //ADDING TASK TO ARRAYLIST
-            var positionType = "after";
-            if ($("input[name='radInsert']:checked").val().toLowerCase() == "before") {
-                positionType = "before";
+            
+            if($('.btnStartDate').datetimepicker('getValue') == "null" || $('.btnStartDate').datetimepicker('getValue') == undefined){
+                canAdd = false;
+                msg = "Please choose starting date";
             }
-
-            var internalIndex = 0;
-            if ($(".ddlInsert").val() != "" && $(".ddlInsert").val() != undefined && parseInt($(".ddlInsert").val()) >= 0)
-                internalIndex = $(".ddlInsert").val();
-
-            var positionIndex = 0;
-            $.each(workflowTasks, function (i) {
-                if (workflowTasks[i].taskGraphIndex == internalIndex) {
-                    positionIndex = i;
-                    return false;
+               
+            var emailArray = $(".emailVal").val().split(";");
+            $.each(emailArray, function (i) {
+                if (!validateEmail(emailArray[i])) {
+                    canAdd = false;
+                    msg = "Please enter valid email";
                 }
             });
-
-            if (positionType == "after") {
-                positionIndex++;
-            }
-            else {
-                if (positionType == "before" && positionIndex == 0) {
-                    positionIndex++;
+            
+            if($(".ddlType").val() == "condition"){
+                if($(".ddlTrueRedirect").val() == $(".ddlFalseRedirect").val()){
+                    canAdd = false;
+                    msg = "Please choose different redirections";
                 }
             }
+            
+            if($(".titleVal").val() == "" || $(".titleVal").val() == " " || $(".titleVal").val().length == 0){
+                canAdd = false;
+                msg = "Please enter task title";
+            }
+            
+            if(canAdd){
+                $("#lblBtnAdd").html("");
+                //ADDING TASK TO OBJ
+                var tag = "";
+                if ($(".ddlType").val() == "condition") {
+                    tag = "cond" + conditionsCount;
+                    conditionsCount++;
+                } else {
+                    if ($(".ddlType").val() == "operation") {
+                        tag = "op" + operationsCount;
+                        operationsCount++;
+                    }
+                }
+                var task = {
+                    "taskId": "0",
+                    "taskGraphIndex": workflowTasks.length,
+                    "tag": tag,
+                    "title": $(".titleVal").val(),
+                    "type": $(".ddlType").val(),
+                    "trueRedirect": ($(".ddlType").val() == "condition") ? $(".ddlTrueRedirect").val() : "",
+                    "falseRedirect": ($(".ddlType").val() == "condition") ? $(".ddlFalseRedirect").val() : "",
+                    "description": $(".descriptionVal").val(),
+                    "email": $(".emailVal").val(),
+                    "startDate": $('.btnStartDate').datetimepicker('getValue'),
+                    "endDate": $('.btnEndDate').datetimepicker('getValue')
+                }
 
-            workflowTasks.splice(positionIndex, 0, task);
-            //getObjects(workflowTasks, "taskGraphIndex", positionIndex);
-            //workflowTasks.push(task);
+                //ADDING TASK TO ARRAYLIST
+                var positionType = "after";
+                if ($("input[name='radInsert']:checked").val().toLowerCase() == "before") {
+                    positionType = "before";
+                }
 
-            //CLEAR INPUTS
-            $(".dragDropMenu .inputText").val("");
-            $(".dragDropMenu .inputTextArea").val("");
-            $('.dragDropMenu .btnStartDate').datetimepicker('reset');
-            $('.dragDropMenu .btnEndDate').datetimepicker('reset');
-            $('.dragDropMenu .chosenStartDate').html("");
-            $('.dragDropMenu .chosenEndDate').html("");
-            $($(".dragDropMenu input[name='radInsert']")[0]).prop("checked", "checked");
+                var internalIndex = 0;
+                if ($(".ddlInsert").val() != "" && $(".ddlInsert").val() != undefined && parseInt($(".ddlInsert").val()) >= 0)
+                    internalIndex = $(".ddlInsert").val();
+
+                var positionIndex = 0;
+                $.each(workflowTasks, function (i) {
+                    if (workflowTasks[i].taskGraphIndex == internalIndex) {
+                        positionIndex = i;
+                        return false;
+                    }
+                });
+
+                if (positionType == "after") {
+                    positionIndex++;
+                }
+                else {
+                    if (positionType == "before" && positionIndex == 0) {
+                        positionIndex++;
+                    }
+                }
+
+                workflowTasks.splice(positionIndex, 0, task);
+                //getObjects(workflowTasks, "taskGraphIndex", positionIndex);
+                //workflowTasks.push(task);
+
+                //CLEAR INPUTS
+                $(".dragDropMenu .inputText").val("");
+                $(".dragDropMenu .inputTextArea").val("");
+                $('.dragDropMenu .btnStartDate').datetimepicker('reset');
+                $('.dragDropMenu .btnEndDate').datetimepicker('reset');
+                $('.dragDropMenu .chosenStartDate').html("");
+                $('.dragDropMenu .chosenEndDate').html("");
+                $($(".dragDropMenu input[name='radInsert']")[0]).prop("checked", "checked");
+            }else{
+                $("#lblBtnAdd").html(msg);
+            }
+            
             break;
 
         case "btnsave":
-            //ADDING TASK TO OBJ
-            var curTask = {};
+            var canAdd = true;
+            var msg = "";
+                    
+            if($('.popupBtnStartDate').datetimepicker('getValue') > $('.popupBtnEndDate').datetimepicker('getValue')){
+                canAdd = false;
+                msg = "Start date should be less than end date";
+            }
             
-            var indexOfTask = -1;
-            $.each(workflowTasks, function (i) {
-                if(workflowTasks[i]["taskGraphIndex"] == $($(elementClicked).closest("#taskPopup")).attr("taskgraphindex")){
-                    curTask = workflowTasks[i];
-                    indexOfTask = i;
+            if($('.popupBtnEndDate').datetimepicker('getValue') == "null" || $('.popupBtnEndDate').datetimepicker('getValue') == undefined){
+                canAdd = false;
+                msg = "Please choose end date";
+            }
+            
+            if($('.popupBtnStartDate').datetimepicker('getValue') == "null" || $('.popupBtnStartDate').datetimepicker('getValue') == undefined){
+                canAdd = false;
+                msg = "Please choose starting date";
+            }
+               
+            var emailArray = $(".popupEmailVal").val().split(";");
+            $.each(emailArray, function (i) {
+                if (!validateEmail(emailArray[i])) {
+                    canAdd = false;
+                    msg = "Please enter valid email";
                 }
             });
-            workflowTasks.splice(indexOfTask, 1);
             
-            curTask.title = $(".popupTtl").val();
-            curTask.type = $(".popupDdlType").val();
-            curTask.trueRedirect = ($(".popupDdlType").val() == "condition") ? $(".popupDdlTrueRedirect").val() : "";
-            curTask.falseRedirect = ($(".popupDdlType").val() == "condition") ? $(".popupDdlFalseRedirect").val() : "";
-            curTask.description = $(".popupDescriptionVal").val();
-            curTask.email = $(".popupEmailVal").val();
-            curTask.startDate = $('.popupBtnStartDate').datetimepicker('getValue');
-            curTask.endDate = $('.popupBtnEndDate').datetimepicker('getValue');
-            
-            
-            //ADDING TASK TO ARRAYLIST
-            var positionType = "after";
-            if ($("input[name='popupRadInsert']:checked").val().toLowerCase() == "before") {
-                positionType = "before";
-            }
-
-            var internalIndex = 0;
-            if ($(".popupDdlInsert").val() != "" && $(".popupDdlInsert").val() != undefined && parseInt($(".popupDdlInsert").val()) >= 0)
-                internalIndex = $(".popupDdlInsert").val();
-
-            var positionIndex = 0;
-            $.each(workflowTasks, function (i) {
-                if (workflowTasks[i].taskGraphIndex == internalIndex) {
-                    positionIndex = i;
-                    return false;
+            if($(".popupDdlType").val() == "condition"){
+                if($(".popupDdlTrueRedirect").val() == $(".popupDdlFalseRedirect").val()){
+                    canAdd = false;
+                    msg = "Please choose different redirections";
                 }
-            });
-
-            if (positionType == "after") {
-                positionIndex++;
             }
-            else {
-                if (positionType == "before" && positionIndex == 0) {
+            
+            if($(".popupTtl").val() == "" || $(".popupTtl").val() == " " || $(".popupTtl").val().length == 0){
+                canAdd = false;
+                msg = "Please enter task title";
+            }
+            
+            if(canAdd){
+                $("#lblBtnSave").html("");
+                //ADDING TASK TO OBJ
+                var curTask = {};
+
+                var indexOfTask = -1;
+                $.each(workflowTasks, function (i) {
+                    if(workflowTasks[i]["taskGraphIndex"] == $($(elementClicked).closest("#taskPopup")).attr("taskgraphindex")){
+                        curTask = workflowTasks[i];
+                        indexOfTask = i;
+                    }
+                });
+                workflowTasks.splice(indexOfTask, 1);
+
+                curTask.title = $(".popupTtl").val();
+                curTask.type = $(".popupDdlType").val();
+                curTask.trueRedirect = ($(".popupDdlType").val() == "condition") ? $(".popupDdlTrueRedirect").val() : "";
+                curTask.falseRedirect = ($(".popupDdlType").val() == "condition") ? $(".popupDdlFalseRedirect").val() : "";
+                curTask.description = $(".popupDescriptionVal").val();
+                curTask.email = $(".popupEmailVal").val();
+                curTask.startDate = $('.popupBtnStartDate').datetimepicker('getValue');
+                curTask.endDate = $('.popupBtnEndDate').datetimepicker('getValue');
+
+
+                //ADDING TASK TO ARRAYLIST
+                var positionType = "after";
+                if ($("input[name='popupRadInsert']:checked").val().toLowerCase() == "before") {
+                    positionType = "before";
+                }
+
+                var internalIndex = 0;
+                if ($(".popupDdlInsert").val() != "" && $(".popupDdlInsert").val() != undefined && parseInt($(".popupDdlInsert").val()) >= 0)
+                    internalIndex = $(".popupDdlInsert").val();
+
+                var positionIndex = 0;
+                $.each(workflowTasks, function (i) {
+                    if (workflowTasks[i].taskGraphIndex == internalIndex) {
+                        positionIndex = i;
+                        return false;
+                    }
+                });
+
+                if (positionType == "after") {
                     positionIndex++;
                 }
+                else {
+                    if (positionType == "before" && positionIndex == 0) {
+                        positionIndex++;
+                    }
+                }
+
+                workflowTasks.splice(positionIndex, 0, curTask);
+
+                //CLEAR INPUTS
+                $(".inputTask").val("");
+                $('.popupBtnStartDate').datetimepicker('reset');
+                $('.popupBtnEndDate').datetimepicker('reset');
+                $('.popupChosenStartDate').html("");
+                $('.popupChosenEndDate').html("");
+                $($("input[name='popupRadInsert']")[0]).prop("checked", "checked");
+                $("#taskPopup").bPopup().close();
+            }else{
+                $("#lblBtnSave").html(msg);
             }
-
-            workflowTasks.splice(positionIndex, 0, curTask);
-
-            //CLEAR INPUTS
-            $(".inputTask").val("");
-            $('.popupBtnStartDate').datetimepicker('reset');
-            $('.popupBtnEndDate').datetimepicker('reset');
-            $('.popupChosenStartDate').html("");
-            $('.popupChosenEndDate').html("");
-            $($("input[name='popupRadInsert']")[0]).prop("checked", "checked");
-            $("#taskPopup").bPopup().close();
             break;
     }
     
@@ -601,4 +689,14 @@ function saveWorkflow1(){
                         return true;
                     }
                 });
+}
+
+function validateEmail(sEmail) {
+    var filter = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
+    if (filter.test(sEmail)) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
