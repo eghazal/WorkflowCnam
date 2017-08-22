@@ -15,7 +15,7 @@
 <!--Scripts-->
 <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="js/raphael-min.js"></script>
+<script src="js/raphael.min.js"></script>
 <script src="js/jquery.min.js"></script>
 <script src="js/services.js"></script>
 <script src="js/flowchart.min.js"></script>
@@ -103,6 +103,8 @@
                                 <span class="chosenEndDate"></span>
                             </div>
                             <div class="btn btnAdd" id="btnAdd">ADD TO WORKFLOW</div>
+		            <div class="clear"></div>
+                            <label for="btnAdd" id="lblBtnAdd"></label>
                         </div>
                         <div class="clear"></div>
 			<div id="manualCont" class="btn btnMenu">ADVANCED MODE</div>
@@ -195,6 +197,8 @@ cond(no)->op</div>
 					<div class="col-md-12 col-sm-12 col-xs-12 noPadding">
 						<div class="btn btnDelete">DELETE</div>
 						<div class="btn btnSave" id="btnSave">UPDATE</div>
+						<div class="clear"></div>
+                                                <label for="btnSave" id="lblBtnSave"></label>
 					</div>
 				</div>
 			</div>
