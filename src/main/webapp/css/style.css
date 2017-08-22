@@ -31,6 +31,7 @@ html,body { height: 100% !important; margin: 0px; padding: 0px;width: 100% !impo
 .popupChosenStartDate, .popupChosenEndDate{float: left;margin-left: 15px;line-height: 35px;}
 .btnStartDate, .btnEndDate{float: left;}
 .xdsoft_datetimepicker {z-index: 9999 !important;}
+#lblBtnAdd,#lblBtnSave{color: red;}
 @media screen and (max-width: 768px) {
     .taskPopup{top: 9% !important;}
 	.taskPopupCont{width: 80%;}
