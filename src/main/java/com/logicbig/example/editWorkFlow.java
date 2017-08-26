@@ -14,11 +14,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import javax.servlet.ServletContext;
+import javax.servlet.annotation.WebServlet;
 /**
  *
  * @author eghaz
  */
-public class workflowMain extends HttpServlet {
+@WebServlet(urlPatterns = {"/editWorkFlow"})
+public class editWorkFlow extends HttpServlet {
 
       @Override
     protected void doPost (HttpServletRequest req,
@@ -40,7 +42,7 @@ public class workflowMain extends HttpServlet {
             session.setAttribute("userName", name);
             
             //req.getServletContext().getRequestDispatcher("/workflowMain.jsp").forward(req, resp);
-            context.getRequestDispatcher("/workflowMain.jsp").forward(req, resp);
+            context.getRequestDispatcher("/editWorkFlow.jsp").forward(req, resp);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

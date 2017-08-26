@@ -43,6 +43,7 @@
                 console.log('id_token: ' + googleUser.getAuthResponse().id_token);
                 console.log('profile : ' + profile);
                 var redirectUrl = 'workflowMain';
+                //var redirectURL='workflowList';
                 var form = $('<form action="' + redirectUrl + '" method="post">' +
                         '<input type="text" name="id_token" value="' +
                         googleUser.getAuthResponse().id_token + '" />' +

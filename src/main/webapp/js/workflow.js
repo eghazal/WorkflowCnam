@@ -2,39 +2,53 @@ var workflowTasks = [];
 var operationsCount = 1;
 var conditionsCount = 1;
 var workflowStr = "";
-var apiURL="localhost:9999";
-//var apiURL="https://workflowapi-176706.appspot.com";
-$(document).ready(function() {
-    
-    if(workflowTasks.length == 0){
+//var apiURL = "http://localhost:9999";
+var apiURL="https://workflowapi-176706.appspot.com";
+$(document).ready(function () {
+
+    if (parseInt($("#workflowId").val()) > 0) {
+        loadWorkflowTasks();
+    } else {
+        if (workflowTasks.length == 0) {
+            createStartEnd();
+            createWorkflowStr();
+            renderWorkflow();
+        } else {
+            $('#manualFlowChart').html($('.flowchart').html());
+            renderWorkflow();
+        }
+    }
+
+
+    if (workflowTasks.length == 0) {
         createStartEnd();
         createWorkflowStr();
         renderWorkflow();
-    }else{
+    } else {
         $('#manualFlowChart').html($('.flowchart').html());
         renderWorkflow();
     }
-        
-    $(".btnRender").on("click", function(){
+
+    $(".btnRender").on("click", function () {
         renderWorkflow();
     });
 
-    $(".btnMenu").on("click", function(){
-        if($(this).attr('id') == 'dragDropCont'){
-                $(".menuWorkflow").not($(".dragDropMenu")).slideUp();
-                $(".dragDropMenu").slideToggle();
-        }else{
-                if($(this).attr('id') == 'manualCont'){
-                        $(".menuWorkflow").not($(".manualMenu")).slideUp();
-                        $(".manualMenu").slideToggle();
-                }
+    $(".btnMenu").on("click", function () {
+        if ($(this).attr('id') == 'dragDropCont') {
+            $(".menuWorkflow").not($(".dragDropMenu")).slideUp();
+            $(".dragDropMenu").slideToggle();
+        } else {
+            if ($(this).attr('id') == 'manualCont') {
+                $(".menuWorkflow").not($(".manualMenu")).slideUp();
+                $(".manualMenu").slideToggle();
+            }
         }
     });
 
-    $("body").on("click", ".task, .end-element", function(){
+    $("body").on("click", ".task, .end-element", function () {
         var task = $(this);
         var taskObj = {};
-        if($(this).prop("classList").toString().indexOf("task") > -1){
+        if ($(this).prop("classList").toString().indexOf("task") > -1) {
             if ($(".task").length > 0) {
                 for (var taskCount = 0; taskCount <= $(".task").length - 1; taskCount++) {
                     if ($(this).is($($(".task")[taskCount]))) {
@@ -42,11 +56,11 @@ $(document).ready(function() {
                         continue;
                     }
                 }
-            }  
-            
-        }else
+            }
+
+        } else
             taskObj = workflowTasks[workflowTasks.length - 1];
-        
+
         //CLEAR INPUTS
         $(".taskPopupCont .inputText").val("");
         $('.taskPopupCont .popupBtnStartDate').datetimepicker('reset');
@@ -54,7 +68,7 @@ $(document).ready(function() {
         $('.taskPopupCont .popupChosenStartDate').html("");
         $('.taskPopupCont .popupChosenEndDate').html("");
         $($(".taskPopupCont input[name='popupRadInsert']")[0]).prop("checked", "checked");
-        
+
         //SET INPUTS
         $(".popupTtl").val(taskObj.title);
         $(".popupDdlType").val(taskObj.type);
@@ -74,75 +88,75 @@ $(document).ready(function() {
             value: new Date(taskObj.endDate)
         });
         $(".popupChosenEndDate").html(formatDateStr(taskObj.endDate));
-        
-        if(taskObj.type == "condition"){
+
+        if (taskObj.type == "condition") {
             $(".popupTrueCont").show();
             $(".popupFalseCont").show();
-        }else{
+        } else {
             $(".popupTrueCont").hide();
             $(".popupFalseCont").hide();
         }
-        
+
         $('#taskPopup').attr("taskGraphIndex", taskObj.taskGraphIndex).bPopup({
-                closeClass:'closeModule',
-                modalClose: false,
-                opacity: 0.6,
-                positionStyle: 'fixed',
-                zIndex: 9996
+            closeClass: 'closeModule',
+            modalClose: false,
+            opacity: 0.6,
+            positionStyle: 'fixed',
+            zIndex: 9996
         });
     });
-	
-    $(".ddlType").on("change", function(){
-       var selectedOp = $(this).val(); 
-       switch(selectedOp.toLowerCase()){
-           case "operation":
-               $(".trueCont").hide();
+
+    $(".ddlType").on("change", function () {
+        var selectedOp = $(this).val();
+        switch (selectedOp.toLowerCase()) {
+            case "operation":
+                $(".trueCont").hide();
                 $(".falseCont").hide();
-               break;
-               
+                break;
+
             case "condition":
                 $(".trueCont").show();
                 $(".falseCont").show();
                 break;
-       }
-    });   
-    
-    $(".popupDdlType").on("change", function(){
-       var selectedOp = $(this).val(); 
-       switch(selectedOp.toLowerCase()){
-           case "operation":
-               $(".popupTrueCont").hide();
-               $(".popupFalseCont").hide();
-               break;
-               
+        }
+    });
+
+    $(".popupDdlType").on("change", function () {
+        var selectedOp = $(this).val();
+        switch (selectedOp.toLowerCase()) {
+            case "operation":
+                $(".popupTrueCont").hide();
+                $(".popupFalseCont").hide();
+                break;
+
             case "condition":
                 $(".popupTrueCont").show();
                 $(".popupFalseCont").show();
                 break;
-       }
-    });   
-    
-    $(".btnStartDate").datetimepicker({minDate: Date.now(), 
-        onGenerate: function(){
+        }
+    });
+
+    $(".btnStartDate").datetimepicker({minDate: Date.now(),
+        onGenerate: function () {
             $(this).attr('id', "startingDate")
         },
         onSelectDate: function (dataD) {
             $('.chosenStartDate').html(formatDateStr(dataD));
             $(".btnEndDate").datetimepicker({
                 minDate: ($('.btnStartDate').datetimepicker('getValue') != null) ? $('.btnStartDate').datetimepicker('getValue') : Date.now()
-                });
+            });
         },
         onSelectTime: function (dataD) {
             $('.chosenStartDate').html(formatDateStr(dataD));
             $(".btnEndDate").datetimepicker({
                 minDate: ($('.btnStartDate').datetimepicker('getValue') != null) ? $('.btnStartDate').datetimepicker('getValue') : Date.now()
-                });
+            });
         }
     });
-    
+
     $(".btnEndDate").datetimepicker({
         minDate: ($('.btnStartDate').datetimepicker('getValue') != null) ? $('.btnStartDate').datetimepicker('getValue') : Date.now(),
-        onGenerate: function(){
+        onGenerate: function () {
             $(this).attr('id', "endDate")
         },
         onSelectDate: function (dataD) {
@@ -152,28 +166,28 @@ $(document).ready(function() {
             $('.chosenEndDate').html(formatDateStr(dataD));
         }
     });
-    
-    $(".popupBtnStartDate").datetimepicker({minDate: Date.now(), 
-        onGenerate: function(){
+
+    $(".popupBtnStartDate").datetimepicker({minDate: Date.now(),
+        onGenerate: function () {
             $(this).attr('id', "popupStartingDate")
         },
         onSelectDate: function (dataD) {
             $('.popupChosenStartDate').html(formatDateStr(dataD));
             $(".popupBtnEndDate").datetimepicker({
                 minDate: ($('.popupBtnStartDate').datetimepicker('getValue') != null) ? $('.popupBtnStartDate').datetimepicker('getValue') : Date.now()
-                });
+            });
         },
         onSelectTime: function (dataD) {
             $('.popupChosenStartDate').html(formatDateStr(dataD));
             $(".popupBtnEndDate").datetimepicker({
                 minDate: ($('.popupBtnStartDate').datetimepicker('getValue') != null) ? $('.popupBtnStartDate').datetimepicker('getValue') : Date.now()
-                });
+            });
         }
     });
-    
+
     $(".popupBtnEndDate").datetimepicker({
         minDate: ($('.popupBtnStartDate').datetimepicker('getValue') != null) ? $('.popupBtnStartDate').datetimepicker('getValue') : Date.now(),
-        onGenerate: function(){
+        onGenerate: function () {
             $(this).attr('id', "popupEndDate")
         },
         onSelectDate: function (dataD) {
@@ -183,41 +197,41 @@ $(document).ready(function() {
             $('.popupChosenEndDate').html(formatDateStr(dataD));
         }
     });
-    
-    $(".btnAdd, .btnSave").on("click", function(){
+
+    $(".btnAdd, .btnSave").on("click", function () {
         addTask($(this));
     });
-    
-    $(".btnDelete").on("click", function(){
+
+    $(".btnDelete").on("click", function () {
         removeTask();
     });
-    
-    $(".btnSaveWorkflow").on("click",function(){
+
+    $(".btnSaveWorkflow").on("click", function () {
         saveWorkflow1();
     });
 });
 
-function renderWorkflow(){
+function renderWorkflow() {
     $('.flowchart svg').remove();
     $('.flowchart').html($('#manualFlowChart').val());
     renderFunction();
 }
 
-function renderFunction(){
+function renderFunction() {
     $(".flowchart").flowChart({
-        "line-color"    : "#E91E63",
-        "element-color" : "#263238",
-        "symbols"       : {
-                "start"     : {
-                        "element-color" : "#E91E63",
-                        "fill"          : "#E91E63"
-                }
+        "line-color": "#E91E63",
+        "element-color": "#263238",
+        "symbols": {
+            "start": {
+                "element-color": "#E91E63",
+                "fill": "#E91E63"
+            }
         }
     });
 }
 
 
-function formatDateStr(dateStr){
+function formatDateStr(dateStr) {
     var d = new Date(dateStr);
     var day = d.getDate();
     var month = d.getMonth() + 1;
@@ -231,13 +245,13 @@ function formatDateStr(dateStr){
     if (month < 10) {
         month = "0" + month;
     }
-    if(hour < 10){
+    if (hour < 10) {
         hour = "0" + hour;
     }
-    if(minute < 10){
+    if (minute < 10) {
         minute = "0" + minute;
     }
-    if(second < 10){
+    if (second < 10) {
         second = "0" + second;
     }
     var date = day + "/" + month + "/" + year + " " + hour + ":" + minute + ":" + second;
@@ -245,30 +259,30 @@ function formatDateStr(dateStr){
 }
 
 
-function addTask(elementClicked){
+function addTask(elementClicked) {
     //VALIDATE TASK BEFORE ADD
-    
+
     var elementId = $(elementClicked).attr("id");
-    switch(elementId.toLowerCase()){
+    switch (elementId.toLowerCase()) {
         case "btnadd":
             var canAdd = true;
             var msg = "";
-                    
-            if($('.btnStartDate').datetimepicker('getValue') > $('.btnEndDate').datetimepicker('getValue')){
+
+            if ($('.btnStartDate').datetimepicker('getValue') > $('.btnEndDate').datetimepicker('getValue')) {
                 canAdd = false;
                 msg = "Start date should be less than end date";
             }
-            
-            if($('.btnEndDate').datetimepicker('getValue') == "null" || $('.btnEndDate').datetimepicker('getValue') == undefined){
+
+            if ($('.btnEndDate').datetimepicker('getValue') == "null" || $('.btnEndDate').datetimepicker('getValue') == undefined) {
                 canAdd = false;
                 msg = "Please choose end date";
             }
-            
-            if($('.btnStartDate').datetimepicker('getValue') == "null" || $('.btnStartDate').datetimepicker('getValue') == undefined){
+
+            if ($('.btnStartDate').datetimepicker('getValue') == "null" || $('.btnStartDate').datetimepicker('getValue') == undefined) {
                 canAdd = false;
                 msg = "Please choose starting date";
             }
-               
+
             var emailArray = $(".emailVal").val().split(";");
             $.each(emailArray, function (i) {
                 if (!validateEmail(emailArray[i])) {
@@ -276,20 +290,20 @@ function addTask(elementClicked){
                     msg = "Please enter valid email";
                 }
             });
-            
-            if($(".ddlType").val() == "condition"){
-                if($(".ddlTrueRedirect").val() == $(".ddlFalseRedirect").val()){
+
+            if ($(".ddlType").val() == "condition") {
+                if ($(".ddlTrueRedirect").val() == $(".ddlFalseRedirect").val()) {
                     canAdd = false;
                     msg = "Please choose different redirections";
                 }
             }
-            
-            if($(".titleVal").val() == "" || $(".titleVal").val() == " " || $(".titleVal").val().length == 0){
+
+            if ($(".titleVal").val() == "" || $(".titleVal").val() == " " || $(".titleVal").val().length == 0) {
                 canAdd = false;
                 msg = "Please enter task title";
             }
-            
-            if(canAdd){
+
+            if (canAdd) {
                 $("#lblBtnAdd").html("");
                 //ADDING TASK TO OBJ
                 var tag = "";
@@ -336,8 +350,7 @@ function addTask(elementClicked){
 
                 if (positionType == "after") {
                     positionIndex++;
-                }
-                else {
+                } else {
                     if (positionType == "before" && positionIndex == 0) {
                         positionIndex++;
                     }
@@ -355,31 +368,31 @@ function addTask(elementClicked){
                 $('.dragDropMenu .chosenStartDate').html("");
                 $('.dragDropMenu .chosenEndDate').html("");
                 $($(".dragDropMenu input[name='radInsert']")[0]).prop("checked", "checked");
-            }else{
+            } else {
                 $("#lblBtnAdd").html(msg);
             }
-            
+
             break;
 
         case "btnsave":
             var canAdd = true;
             var msg = "";
-                    
-            if($('.popupBtnStartDate').datetimepicker('getValue') > $('.popupBtnEndDate').datetimepicker('getValue')){
+
+            if ($('.popupBtnStartDate').datetimepicker('getValue') > $('.popupBtnEndDate').datetimepicker('getValue')) {
                 canAdd = false;
                 msg = "Start date should be less than end date";
             }
-            
-            if($('.popupBtnEndDate').datetimepicker('getValue') == "null" || $('.popupBtnEndDate').datetimepicker('getValue') == undefined){
+
+            if ($('.popupBtnEndDate').datetimepicker('getValue') == "null" || $('.popupBtnEndDate').datetimepicker('getValue') == undefined) {
                 canAdd = false;
                 msg = "Please choose end date";
             }
-            
-            if($('.popupBtnStartDate').datetimepicker('getValue') == "null" || $('.popupBtnStartDate').datetimepicker('getValue') == undefined){
+
+            if ($('.popupBtnStartDate').datetimepicker('getValue') == "null" || $('.popupBtnStartDate').datetimepicker('getValue') == undefined) {
                 canAdd = false;
                 msg = "Please choose starting date";
             }
-               
+
             var emailArray = $(".popupEmailVal").val().split(";");
             $.each(emailArray, function (i) {
                 if (!validateEmail(emailArray[i])) {
@@ -387,27 +400,27 @@ function addTask(elementClicked){
                     msg = "Please enter valid email";
                 }
             });
-            
-            if($(".popupDdlType").val() == "condition"){
-                if($(".popupDdlTrueRedirect").val() == $(".popupDdlFalseRedirect").val()){
+
+            if ($(".popupDdlType").val() == "condition") {
+                if ($(".popupDdlTrueRedirect").val() == $(".popupDdlFalseRedirect").val()) {
                     canAdd = false;
                     msg = "Please choose different redirections";
                 }
             }
-            
-            if($(".popupTtl").val() == "" || $(".popupTtl").val() == " " || $(".popupTtl").val().length == 0){
+
+            if ($(".popupTtl").val() == "" || $(".popupTtl").val() == " " || $(".popupTtl").val().length == 0) {
                 canAdd = false;
                 msg = "Please enter task title";
             }
-            
-            if(canAdd){
+
+            if (canAdd) {
                 $("#lblBtnSave").html("");
                 //ADDING TASK TO OBJ
                 var curTask = {};
 
                 var indexOfTask = -1;
                 $.each(workflowTasks, function (i) {
-                    if(workflowTasks[i]["taskGraphIndex"] == $($(elementClicked).closest("#taskPopup")).attr("taskgraphindex")){
+                    if (workflowTasks[i]["taskGraphIndex"] == $($(elementClicked).closest("#taskPopup")).attr("taskgraphindex")) {
                         curTask = workflowTasks[i];
                         indexOfTask = i;
                     }
@@ -444,8 +457,7 @@ function addTask(elementClicked){
 
                 if (positionType == "after") {
                     positionIndex++;
-                }
-                else {
+                } else {
                     if (positionType == "before" && positionIndex == 0) {
                         positionIndex++;
                     }
@@ -461,22 +473,22 @@ function addTask(elementClicked){
                 $('.popupChosenEndDate').html("");
                 $($("input[name='popupRadInsert']")[0]).prop("checked", "checked");
                 $("#taskPopup").bPopup().close();
-            }else{
+            } else {
                 $("#lblBtnSave").html(msg);
             }
             break;
     }
-    
-    
+
+
     //UPDATE LISTS IN SIMPLE MODE
     updateLists();
-    
+
     //RENDER WORKFLOW
     createWorkflowStr();
     renderWorkflow();
 }
 
-function createStartEnd(){
+function createStartEnd() {
     var startTask = {
         "taskId": "0",
         "taskGraphIndex": 0,
@@ -490,9 +502,9 @@ function createStartEnd(){
         "startDate": "",
         "endDate": ""
     }
-    
+
     workflowTasks.push(startTask);
-    
+
     var endTask = {
         "taskId": "0",
         "taskGraphIndex": 1,
@@ -506,20 +518,20 @@ function createStartEnd(){
         "startDate": "",
         "endDate": ""
     }
-    
+
     workflowTasks.push(endTask);
 }
 
-function updateLists(){
+function updateLists() {
     $(".ddlTrueRedirect").html("");
     $(".ddlFalseRedirect").html("");
     $(".ddlInsert").html("");
     $(".popupDdlTrueRedirect").html("");
     $(".popupDdlFalseRedirect").html("");
     $(".popupDdlInsert").html("");
-    
-    $.each(workflowTasks, function(i){
-        if(i != 0 && i != (workflowTasks.length - 1)){
+
+    $.each(workflowTasks, function (i) {
+        if (i != 0 && i != (workflowTasks.length - 1)) {
             $(".ddlTrueRedirect").append("<option value=" + workflowTasks[i].taskGraphIndex + ">" + workflowTasks[i].title + "</option>");
             $(".ddlFalseRedirect").append("<option value=" + workflowTasks[i].taskGraphIndex + ">" + workflowTasks[i].title + "</option>");
             $(".ddlInsert").append("<option value=" + workflowTasks[i].taskGraphIndex + ">" + workflowTasks[i].title + "</option>");
@@ -527,9 +539,9 @@ function updateLists(){
             $(".popupDdlFalseRedirect").append("<option value=" + workflowTasks[i].taskGraphIndex + ">" + workflowTasks[i].title + "</option>");
             $(".popupDdlInsert").append("<option value=" + workflowTasks[i].taskGraphIndex + ">" + workflowTasks[i].title + "</option>");
         }
-        
+
     });
-    
+
     var endTask = getObjects(workflowTasks, "tag", "e");
     $(".ddlTrueRedirect").append("<option value=" + endTask[0].taskGraphIndex + " >" + endTask[0].title + "</option>");
     $(".ddlFalseRedirect").append("<option value=" + endTask[0].taskGraphIndex + " >" + endTask[0].title + "</option>");
@@ -537,21 +549,21 @@ function updateLists(){
     $(".popupDdlFalseRedirect").append("<option value=" + endTask[0].taskGraphIndex + " >" + endTask[0].title + "</option>");
 }
 
-function createWorkflowStr(){
+function createWorkflowStr() {
     workflowStr = "";
     var workflowSchema = "";
     var workflowConditions = "";
-    $.each(workflowTasks, function(i){
-        
+    $.each(workflowTasks, function (i) {
+
         //DEFINITION OF ALL TASKS + CREATION OF THE SCHEMA OF TASKS 
-        if(i == 0){
+        if (i == 0) {
             workflowStr += "st=>start: " + workflowTasks[i].title + "\n";
             workflowSchema += "st";
-        }else{
-            if(i == (workflowTasks.length - 1)){
+        } else {
+            if (i == (workflowTasks.length - 1)) {
                 workflowStr += "e=>end: " + workflowTasks[i].title + "\n";
                 workflowSchema += "->e" + "\n";
-            }else{
+            } else {
                 switch (workflowTasks[i].type.toLowerCase()) {
                     case "operation":
                         workflowStr += workflowTasks[i].tag + "=>operation: " + workflowTasks[i].title + "\n";
@@ -562,12 +574,12 @@ function createWorkflowStr(){
                     case "condition":
                         workflowStr += workflowTasks[i].tag + "=>condition: " + workflowTasks[i].title + "\n";
                         workflowSchema += "->" + workflowTasks[i].tag;
-                        
+
                         //CREATION OF CONDITIONS + REDIRECTIONS
                         //GET OBJECT OF REDIRECTED TASK INDEX
                         var falseCaseObj = getObjects(workflowTasks, "taskGraphIndex", workflowTasks[i].falseRedirect)
                         workflowConditions += workflowTasks[i].tag + "(no)->" + falseCaseObj[0].tag + "\n";
-                        
+
                         //GET OBJECT OF REDIRECTED TASK INDEX
                         var trueCaseObj = getObjects(workflowTasks, "taskGraphIndex", workflowTasks[i].trueRedirect)
                         workflowConditions += workflowTasks[i].tag + "(yes)->" + trueCaseObj[0].tag + "\n";
@@ -575,14 +587,14 @@ function createWorkflowStr(){
                 }
             }
         }
-    
+
     });
     workflowStr += workflowSchema;
     workflowStr += workflowConditions;
     document.getElementById("manualFlowChart").value = workflowStr;
 }
 
-function removeTask(){
+function removeTask() {
     var taskGraphIndex = $("#taskPopup").attr("taskgraphindex");
     //REMOVING TASK FROM ARRAY
     var indexOfTask = -1;
@@ -591,20 +603,20 @@ function removeTask(){
             indexOfTask = i;
         }
     });
-    
+
     workflowTasks.splice(indexOfTask, 1);
-    
+
     //REMOVING REDIRECTION LINK TO THE DELETED TASK
     $.each(workflowTasks, function (i) {
         if (workflowTasks[i]["falseRedirect"] == taskGraphIndex) {
             workflowTasks[i]["falseRedirect"] = "";
         }
-        
+
         if (workflowTasks[i]["trueRedirect"] == taskGraphIndex) {
             workflowTasks[i]["trueRedirect"] = "";
         }
     });
-    
+
     //UPDATING LISTS
     updateLists();
     createWorkflowStr();
@@ -616,7 +628,8 @@ function removeTask(){
 function getObjects(obj, key, val) {
     var objects = [];
     for (var i in obj) {
-        if (!obj.hasOwnProperty(i)) continue;
+        if (!obj.hasOwnProperty(i))
+            continue;
         if (typeof obj[i] == 'object') {
             objects = objects.concat(getObjects(obj[i], key, val));
         } else if (i == key && obj[key] == val) {
@@ -626,77 +639,94 @@ function getObjects(obj, key, val) {
     return objects;
 }
 
-//function jsonpCallbackFunction(data){
-//    console.log(data);
-//}
 
-//function getFromAPI(){
-//    //https://jsonplaceholder.typicode.com/posts/1
-//    //http://localhost:8080/GetUsers
-//    $.ajax({
-//            crossOrigin: true,
-//            url: 'http://localhost:8080/GetUsers',
-//            type: 'GET',
-//            dataType: "jsonp",
-//            jsonpCallback: 'jsonpCallbackFunction'
-//        });
-//}
-
-function getFromAPI(){
+function getFromAPI() {
     //https://workflowapi-176706.appspot.com
-  $.getJSON(apiURL+'/GetUsers?callback=?',
-    function(data){
-      console.log(data);
-  });
+    $.getJSON(apiURL + '/GetUsers?callback=?',
+            function (data) {
+                console.log(data);
+            });
 }
 
-function saveWorkflow(){
+function saveWorkflow() {
     //https://jsonplaceholder.typicode.com/posts/1
     //http://localhost:8080/GetUsers
     console.log(JSON.stringify(workflowTasks));
+    console.log(userName);
+    console.log(workflowId);
     $.ajax({
-            crossDomain: true,
-            url: apiURL+'/UpsertWorkflow',
-            type: 'POST',
-            crossDomain: true,
-            data: {workflowObj: JSON.stringify(workflowTasks)},
-            dataType: "jsonp",
-            success: function(data){
-                console.log(data);
-            }
-        });
+        crossDomain: true,
+        url: apiURL + '/UpsertWorkflow',
+        type: 'POST',
+        crossDomain: true,
+        data: {
+            workflowObj: JSON.stringify(workflowTasks),
+            userName: userName,
+            workFlowId: workflowId
+
+        },
+        dataType: "jsonp",
+        success: function (data) {
+            console.log(data);
+        }
+    });
 }
 
-function saveWorkflow1(){
+function saveWorkflow1() {
     console.log(JSON.stringify(workflowTasks));
+    var workflowDesc = document.getElementById("wfDesc").value;
     return $.ajax({
-                    url: "http://query.yahooapis.com/v1/public/yql",
-                    // the name of the callback parameter, as specified by the YQL service
-                    jsonp: "callback",
-                    // tell jQuery we're expecting JSONP
-                    dataType: "jsonp",
-                    // tell YQL what we want and that we want JSON
-                    data: {
-                        q: "select * from json where " +
-                                +"url="+apiURL+"/UpsertWorkflow",
-                        type: 'POST',
-                        workflowObj: JSON.stringify(workflowTasks),
-                        crossDomain: true,
-                        format: "json"
-                    },
-                    // work with the response
-                    success: function (response) {
-                        return true;
-                    }
-                });
+        url: "http://query.yahooapis.com/v1/public/yql",
+        // the name of the callback parameter, as specified by the YQL service
+        jsonp: "callback",
+        // tell jQuery we're expecting JSONP
+        dataType: "jsonp",
+        // tell YQL what we want and that we want JSON
+        data: {
+            q: "select * from json where " +
+                    +"url=" + apiURL + "/UpsertWorkflow",
+            type: 'POST',
+            workflowObj: JSON.stringify(workflowTasks),
+            userName: userName,
+            workFlowId: workflowId,
+            workflowDesc: workflowDesc,
+            crossDomain: true,
+            format: "json"
+        },
+        // work with the response
+        success: function (response) {
+            return true;
+        },
+        error : function(error){
+            alert(error);
+        }
+    });
 }
 
 function validateEmail(sEmail) {
     var filter = /^[\w\-\.\+]+\@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
     if (filter.test(sEmail)) {
         return true;
-    }
-    else {
+    } else {
         return false;
     }
+}
+function loadWorkflowTasks() {
+    $.ajax({
+        crossDomain: true,
+        url: apiURL + '/loadWorkflow',
+        type: 'get',
+        data: {workflowId: $("#workflowId").val()},
+        dataType: "jsonp",
+        success: function (data) {
+            var loadedObj = JSON.parse(data);
+            if (loadedObj.workflowObj != "[]") {
+                workflowTasks = loadedObj.workflowObj;
+            }
+        },
+        error: function (error) {
+            console.log(error);
+        }
+
+    });
 }
