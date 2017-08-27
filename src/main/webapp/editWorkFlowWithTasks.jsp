@@ -50,7 +50,7 @@
                %>" />
          <input type="hidden" id="workflowDesc" value="<%
             if (request.getParameter("wfDesc") == null) {
-                out.print("0");
+                out.print("-1");
             } else {
                 out.print(request.getParameter("wfDesc"));
             }
