@@ -7,6 +7,9 @@ var apiURL="https://workflowapi-176706.appspot.com";
 $(document).ready(function () {
 
     if (parseInt($("#workflowId").val()) > 0) {
+        document.getElementById("wfDesc").value=$("#workflowDesc").val();
+        document.getElementById("wfDesc").disabled = true
+        waitingDialog.show("Please wait while loading your tasks...");
         loadWorkflowTasks();
     } else {
         if (workflowTasks.length == 0) {
@@ -716,16 +719,20 @@ function loadWorkflowTasks() {
         crossDomain: true,
         url: apiURL + '/loadWorkflow',
         type: 'get',
-        data: {workflowId: $("#workflowId").val()},
-        dataType: "jsonp",
+        data: {
+            workflowId: $("#workflowId").val(),
+            userName:userName
+        },
+        dataType: "json",
         success: function (data) {
-            var loadedObj = JSON.parse(data);
-            if (loadedObj.workflowObj != "[]") {
-                workflowTasks = loadedObj.workflowObj;
-            }
+            workflowTasks=data;
+            createWorkflowStr();
+            renderWorkflow();
+            waitingDialog.hide();
         },
         error: function (error) {
             console.log(error);
+            waitingDialog.hide();
         }
 
     });
