@@ -43,7 +43,7 @@
         <% } %>
         <input type="hidden" id="workflowId" value="<%
             if (request.getParameter("wfId") == null) {
-                out.print("0");
+                out.print("-1");
             } else {
                 out.print(request.getParameter("wfId"));
             }
