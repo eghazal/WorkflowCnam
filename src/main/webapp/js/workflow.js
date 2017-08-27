@@ -728,6 +728,7 @@ function loadWorkflowTasks() {
             workflowTasks=data;
             createWorkflowStr();
             renderWorkflow();
+            updateLists();
             waitingDialog.hide();
         },
         error: function (error) {
