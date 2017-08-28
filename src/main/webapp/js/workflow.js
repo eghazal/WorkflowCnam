@@ -286,13 +286,21 @@ function addTask(elementClicked) {
                 msg = "Please choose starting date";
             }
 
+            var addedEmail = false;
             var emailArray = $(".emailVal").val().split(";");
             $.each(emailArray, function (i) {
-                if (!validateEmail(emailArray[i])) {
+                if (!validateEmail(emailArray[i]) && emailArray[i] != "") {
                     canAdd = false;
                     msg = "Please enter valid email";
+                }else{
+                    if (validateEmail(emailArray[i])){
+                        addedEmail = true;
+                    }
                 }
             });
+            
+            if(addedEmail == false)
+                canAdd = false;
 
             if ($(".ddlType").val() == "condition") {
                 if ($(".ddlTrueRedirect").val() == $(".ddlFalseRedirect").val()) {
@@ -396,13 +404,21 @@ function addTask(elementClicked) {
                 msg = "Please choose starting date";
             }
 
+            var addedEmail = false;
             var emailArray = $(".popupEmailVal").val().split(";");
             $.each(emailArray, function (i) {
-                if (!validateEmail(emailArray[i])) {
+                if (!validateEmail(emailArray[i]) && emailArray[i] != "") {
                     canAdd = false;
                     msg = "Please enter valid email";
+                }else{
+                    if (validateEmail(emailArray[i])){
+                        addedEmail = true;
+                    }
                 }
             });
+            
+            if(addedEmail == false)
+                canAdd = false;
 
             if ($(".popupDdlType").val() == "condition") {
                 if ($(".popupDdlTrueRedirect").val() == $(".popupDdlFalseRedirect").val()) {
